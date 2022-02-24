@@ -1,0 +1,237 @@
+xml code
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <EditText
+        android:id="@+id/ed1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="name"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <EditText
+        android:id="@+id/ed2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="36dp"
+
+        android:ems="10"
+        android:hint="Surname"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed1" />
+    <EditText
+        android:id="@+id/ed3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="marks"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed2" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:onClick="SaveDat"
+        android:text="Insert"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed3"
+        tools:ignore="OnClick" />
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="96dp"
+        android:layout_marginLeft="96dp"
+        android:layout_marginTop="19dp"
+        android:onClick="read"
+        android:text="Read"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed3"
+        tools:ignore="OnClick" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="207dp"
+        android:layout_marginTop="20dp"
+        android:hint="data"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="192dp"
+        android:layout_marginLeft="192dp"
+        android:layout_marginTop="19dp"
+        android:onClick="update"
+
+        android:text="update"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed3"
+        tools:ignore="OnClick" />
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="288dp"
+        android:layout_marginLeft="288dp"
+        android:layout_marginTop="19dp"
+        android:onClick="delete"
+        android:text="delete"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed3"
+        tools:ignore="OnClick" />
+</android.support.constraint.ConstraintLayout>
+main activity java code
+package com.example.sjcet.database;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    EditText Name,Mark,Surname;
+    TextView DataV;
+    MyDatabase database = new MyDatabase(this) ;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Name = findViewById(R.id.ed1);
+        Surname = findViewById(R.id.ed2);
+        Mark = findViewById(R.id.ed3);
+        DataV = findViewById(R.id.textView);
+    }
+    public void SaveDat(View view) {
+        String UserVal = Name.getText().toString();
+        String SurnameVal = Surname.getText().toString();
+        Integer PassVal = Integer.parseInt(Mark.getText().toString());
+        Boolean result = database.insertdata(UserVal, PassVal,SurnameVal);
+        if (result == true) {
+            Toast.makeText(getApplicationContext(), "Data inserted Sucessfully",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Data inserted failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void read(View view) {
+        Cursor res = database.getAllData();
+        StringBuffer stringBuffer = new StringBuffer();
+        if (res != null && res.getCount() > 0) {
+            while (res.moveToNext()) {
+                stringBuffer.append("Id: " + res.getString(0) + "\n");
+                stringBuffer.append("Name: " + res.getString(1) + "\n");
+                stringBuffer.append("Surname: " + res.getString(2) + "\n");
+                stringBuffer.append("marks: " + res.getString(3) + "\n");
+            }
+            DataV .setText(stringBuffer.toString());
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Data Retrieved Successfully",
+                    Toast.LENGTH_SHORT).show();
+        }
+        Toast.makeText(getApplicationContext(), "Data Retrieved Successfully",
+                Toast.LENGTH_SHORT).show();
+    }
+    public void update(View view) {
+        String UserVal = Name.getText().toString();
+        String SurnameVal = Surname.getText().toString();
+        Integer PassVal = Integer.parseInt(Mark.getText().toString());
+        Boolean result = database.updateData(UserVal, PassVal, SurnameVal);
+        if (result==true){
+            Toast.makeText(getApplicationContext(), "Data updated Successfully",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "No Rows Affected", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void delete(View view) {
+        String UserVal = Name.getText().toString();
+        int result=database.deletedata(UserVal);
+        Toast.makeText(getApplicationContext(), "Rows Affected", Toast.LENGTH_SHORT).show();
+    }
+}
+my database java code
+package com.example.sjcet.database;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.view.View;
+public class MyDatabase extends SQLiteOpenHelper {
+    public MyDatabase(Context context) {
+        super(context, "Login.db", null, 1);
+    }
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("Create table USERS(ID INTEGER PRIMARY KEY AUTOINCREMENT,NAME text,SURNAME text,MARKS INTEGER)");
+    }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS USERS");
+    }
+    public Cursor getAllData() {
+        SQLiteDatabase db=this.getWritableDatabase();
+        Cursor res = db.rawQuery("Select * from USERS",null);
+        return res;
+    }
+    public Boolean insertdata(String userVal, Integer passVal, String surnameVal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("NAME", userVal);
+        contentValues.put("SURNAME", surnameVal);
+        contentValues.put("MARKS", passVal);
+        long result = db.insert("USERS", null, contentValues);
+        db.close();
+        if (result == -1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public int deletedata(String userVal) {
+        SQLiteDatabase db=this.getWritableDatabase();
+        int i =db.delete("USERS","NAME=?",new String[]{userVal});
+        return i;
+    }
+    public Boolean updateData(String userVal, Integer passVal, String surnameVal) {
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put("NAME",userVal);
+        contentValues.put("SURNAME",surnameVal);
+        contentValues.put("MARKS",passVal);
+        int result=db.update("USERS",contentValues,"NAME=?",new String[]{userVal});
+        if (result>0) {
+            return true;
+
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
